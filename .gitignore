@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Optional IDE settings
+.vscode/
+.idea/
+
+# AWS SDK credentials (only needed if using shared config files — already safe if using .env)
+*.pem
+
+# Build artifacts (if any)
+dist/
+build/
+
+# NPM lock files (optional — only if you're using yarn instead)
+package-lock.json

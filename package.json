@@ -1,0 +1,29 @@
+{
+  "name": "mobile-magic",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/ranjeetvit2012/mobile-megic#readme",
+  "bugs": {
+    "url": "https://github.com/ranjeetvit2012/mobile-megic/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ranjeetvit2012/mobile-megic.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-auto-scaling": "^3.804.0",
+    "@aws-sdk/client-ec2": "^3.805.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
