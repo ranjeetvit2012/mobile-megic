@@ -48,13 +48,20 @@ async function refreshInstances() {
       InstanceIds: instanceIds,
     }));
 
-    ALL_MACHINES = ec2Response.Reservations.flatMap(reservation =>
+    const newInstances = ec2Response.Reservations.flatMap(reservation =>
       reservation.Instances.map(instance => ({
         id: instance.InstanceId,
         ip: instance.PublicDnsName,
         isUsed: false,
       }))
     );
+
+    newInstances.forEach((newIns) => {
+      const exists = ALL_MACHINES.some(machine => machine.id === newIns.id);
+      if (!exists) {
+        ALL_MACHINES.push(newIns);
+      }
+    });
 
     console.log("Updated ALL_MACHINES", ALL_MACHINES);
   } catch (err) {
@@ -67,16 +74,20 @@ setInterval(refreshInstances, 10000);
 app.use(express.json());
 
 app.get("/", async (req, res) => {
-  const idleMachine = ALL_MACHINES.find(x => x.isUsed === false);
-
+  const idleMachine = ALL_MACHINES.find(x => !x.isUsed);
+      console.log("idleMachine",idleMachine)
   if (!idleMachine) {
+    // No available machine — scale up
+    const desiredCapacity = ALL_MACHINES.length + 1;
+
     const scaleCommand = new SetDesiredCapacityCommand({
       AutoScalingGroupName: "vscode-asg",
-      DesiredCapacity: ALL_MACHINES.length + 1
+      DesiredCapacity: desiredCapacity
     });
 
     try {
       await client.send(scaleCommand);
+      console.log(`Scaling up to ${desiredCapacity} machines...`);
     } catch (error) {
       console.error("Error scaling up:", error);
     }
@@ -84,11 +95,15 @@ app.get("/", async (req, res) => {
     return res.status(404).send("No idle machine found. Scaling up...");
   }
 
+  // Mark the selected machine as used
   idleMachine.isUsed = true;
-  console.log("idleMachine",idleMachine)
+  console.log("Assigned machine:", idleMachine);
+res.redirect(302, `http://${idleMachine.ip}:8080`);
 
-  res.send({ ip: idleMachine.ip });
+
+ // res.send({ ip: idleMachine.ip });
 });
+
 
 app.post("/destroy", async (req, res) => {
   const machineId = req.body.machineId;
